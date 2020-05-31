@@ -1,0 +1,172 @@
+*, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  background: #97a3a5;
+}
+.section {
+  display: flex;
+  max-width: 1200px;
+  margin: auto;
+  justify-content: center;
+}
+
+
+
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 602px;
+  height: 602px;
+  margin-top: 100px;
+  position: relative;
+  img {
+    background: transparent;
+  }
+}
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  width: 602px;
+  height: 602px;
+  border: #353e45 solid 1px;
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.row {
+  display: flex;
+}
+
+.tile {
+  width: 75px;
+  height: 75px;
+  text-align: center;
+  font-size: 65px;
+  line-height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tile-dark {
+  background-color: #545c64;
+}
+img {
+  height: 65px;
+  display: block;
+}
+
+.control {
+  position: absolute;
+  margin-top: 101px;
+  width: 602px;
+  height: 602px;
+  border: #353e45 solid 1px;
+  padding: 60px 20px;
+  text-align: center;
+  transition: all 0.5s;
+  .button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h2 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #303539;
+    margin: 40px 0 40px 0;
+  }
+  button {
+    padding: 5px;
+  }
+}
+button {
+  margin: 10px 0;
+  display: block;
+  width: 300px;
+  font-size: 26px;
+  border-radius: 10px;
+  border: #353e45 solid 1px;
+  background-color: #97a3a5;
+  transition: all 0.5s;
+  &:hover {
+    transform: scale(1.05);
+  }
+  &:active {
+    transform: scale(1.2);
+  }
+
+}
+
+.console {
+  margin: 100px 0 0 10px;
+  border: #303539 solid 1px;
+  width: 300px;
+  height: 604px;
+  background-color: #545c64;
+  padding: 20px;
+  color: #97A3A5;
+  font-size: 26px;
+  line-height: 30px;
+  transition: all 0.5s;
+  opacity: 0;
+  display: none;
+  .console-header {
+    width: 100%;
+    border: #303539 solid 1px;
+    color: #353e45;
+    text-align: center;
+  }
+  .back-to-menu {
+    margin-bottom: 10px;
+    width: 256px;
+  }
+  button {
+    border-radius: 5px;
+  }
+  .log {
+    width: 100%;
+    color: #97A3A5;
+    border: #97A3A5 solid 1px;
+    height: 450px;
+    background-color: transparent;
+    .output {
+      background-color: transparent;
+      padding: 10px;
+      font-size: 14px;
+      height: 472px;
+      width: 100%;
+    }
+  }
+}
+.wrapper-button-duo {
+  display: flex;
+  background-color: transparent;
+  justify-content: space-between;
+  button {
+    width: 49%;
+    font-size: 16px;
+    line-height: 30px;
+    margin-top: 0;
+
+  }
+}
+.output {
+  max-height: 400px;
+  margin-top: 10px;
+  overflow: auto;
+  .span {
+    background-color: transparent;
+    color: white;
+  }
+  .span-orange {
+    background-color: transparent;
+    color: orange;
+  }
+  .span-red {
+    background-color: transparent;
+    color: red;
+  }
+}

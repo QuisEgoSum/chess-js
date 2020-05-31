@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--<meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">-->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+</head>
+<body>
+    <section class="section">
+        <div class="app">
+            <div class="board" onmousedown="actions.click(event)"></div>
+        </div>
+        <div class="control">
+            <h2>Chess</h2>
+            <div class="button">
+                <button disabled title="Does not work">Continue</button>
+                <button id='start' title="Start a new game" onclick="setting.startGame()">New Game</button>
+                <button disabled title="Does not work">Setting</button>
+            </div>
+        </div>
+        <div class="console">
+            <button class="back-to-menu" disabled title="Does not work">Back to menu</button>
+            <div class="wrapper-button-duo">
+                <button disabled title="Does not work">One step back</button>
+                <button disabled title="Does not work">Forward</button>
+            </div>
+            <div class="log">
+                <div class="console-header">Console</div>
+                <div class="output"></div>
+            </div>
+        </div>
+    </section>
+    <script rel="script" src="js/main.js" type="text/javascript"></script>
+</body>
+</html>
