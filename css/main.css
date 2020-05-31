@@ -174,4 +174,14 @@ button:active {
   color: red;
 }
 
+.control__wrapper-setting {
+  display: none;
+  opacity: 0;
+  transition: all 0.5s;
+}
+
+.control__wrapper-menu {
+  transition: all 0.5s;
+}
+
 /*# sourceMappingURL=main.css.map */

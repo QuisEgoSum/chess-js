@@ -14,18 +14,26 @@
             <div class="board" onmousedown="actions.click(event)"></div>
         </div>
         <div class="control">
-            <h2>Chess</h2>
-            <div class="button">
-                <button disabled title="Does not work">Continue</button>
-                <button id='start' title="Start a new game" onclick="setting.startGame()">New Game</button>
-                <button disabled title="Does not work">Setting</button>
+            <div class="control__wrapper-menu">
+                <h2>Chess</h2>
+                <div class="button">
+                    <button id ='continue' disabled onclick="menu.continueGame()">Continue</button>
+                    <button id='start' title="Start a new game" onclick="menu.newGame()">New Game</button>
+                    <button id="setting" onclick="menu.openSetting()">Setting</button>
+                </div>
+            </div>
+            <div class="control__wrapper-setting">
+                <h2>Setting</h2>
+                <div class="button">
+                    <button onclick="menu.backToForSetting()">Back to menu</button>
+                </div>
             </div>
         </div>
         <div class="console">
-            <button class="back-to-menu" disabled title="Does not work">Back to menu</button>
+            <button class="back-to-menu" onclick="menu.backToForGame()">Back to menu</button>
             <div class="wrapper-button-duo">
-                <button disabled title="Does not work">One step back</button>
-                <button disabled title="Does not work">Forward</button>
+                <button disabled id="back" onclick="history.back()">One step back</button>
+                <button disabled id="forward" onclick="history.forward()" title="Does not work">Forward</button>
             </div>
             <div class="log">
                 <div class="console-header">Console</div>

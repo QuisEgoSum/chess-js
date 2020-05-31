@@ -1,27 +1,70 @@
 "use strict"
 //Жизнь запутана и ветвиста, как строки моего кода
 
-const setting = {
+const menu = {
     //Начальное положение сторон true - белые внизу
     changeParties: true,
-    startGame() {
-        document.querySelector('.console').style.display = 'block'
-        document.querySelector('.control').style.opacity = '0'
+    newGame() {
+        this.continueGame()
+        generate.clear()
         generate.generateBoard()
-        setTimeout(setting.timeout, 500)
+        document.querySelector('#continue').removeAttribute('disabled')
     },
-    timeout() {
-        document.querySelector('.control').style.display = 'none'
-        document.querySelector('.board').style.opacity = '1'
-        document.querySelector('.console').style.opacity = '1'
-    }
-}
+    continueGame() {
+        this.styles(['.console', 'block', '.board', 'block'], ['.control', 1])
+        setTimeout(function () {
+            menu.styles(['.control', 'none'], ['.board', 1, '.console', 1])
+        }, 500)
+    },
+    backToForGame() {
+        this.styles(['.control', 'block'], ['.board', 0, '.console', 0])
+        setTimeout(function () {
+            menu.styles(['.board', 'none', '.console', 'none'], ['.control', 1])
+        }, 500)
+    },
+    openSetting() {
+        this.styles(['.control__wrapper-setting', 'block'], ['.control__wrapper-menu', 0])
+        setTimeout(function () {
+            menu.styles(['.control__wrapper-menu', 'none'], ['.control__wrapper-setting', 1])
+        }, 500)
+    },
+    backToForSetting() {
+        this.styles(['.control__wrapper-menu', 'block'],
+                    ['.control__wrapper-setting', 0],
+                    ['.control__wrapper-menu', 'absolute'])
 
-const dom = {
+        setTimeout(function () {
+            menu.styles(['.control__wrapper-setting', 'none'], ['.control__wrapper-menu', 1],
+                ['.control__wrapper-menu', 'relative'])
+        }, 500)
+    },
+    styles(display, opacity, position = false) {
+        for (let i = 0; i < display.length; i += 2) {
+            document.querySelector(`${display[i]}`).style.display = `${display[i + 1]}`
+        }
+        for (let i = 0; i < opacity.length; i += 2) {
+            document.querySelector(`${opacity[i]}`).style.opacity = `${opacity[i + 1]}`
+        }
+        if (position) {
+            document.querySelector(`${position[0]}`).style.position = `${position[1]}`
+        }
+    },
+    outputMessageArr: [],
     outputMessage(message, classHtml = 'span'){
-
         let messageHtml = `<span class=${classHtml} >${message}</span><br>`
         document.querySelector('.output').insertAdjacentHTML('afterbegin', `${messageHtml}`)
+        this.outputMessageArr.push(message, classHtml)
+    },
+    clearMessage() {
+        while (document.querySelector('.output').firstChild) {
+            document.querySelector('.output').removeChild(document.querySelector('.output').firstChild)
+        }
+    },
+    resetMessage() {
+        for (let i = 0; i < this.outputMessageArr.length; i += 2) {
+            let messageHtml = `<span class=${this.outputMessageArr[i + 1]} >${this.outputMessageArr[i]}</span><br>`
+            document.querySelector('.output').insertAdjacentHTML('afterbegin', `${messageHtml}`)
+        }
     }
 }
 
@@ -80,6 +123,17 @@ const storage = {
 }
 
 const generate = {
+    clear() {
+        storage.arraySpace = [ [], [], [], [], [], [], [], [] ]
+        storage.arrayPossibleMoves = new Map ()
+        actions.choiceOrMove = true
+        move.sideMove = true
+        move.counter = 0
+        while (document.querySelector('.board').firstChild) {
+            document.querySelector('.board').removeChild(document.querySelector('.board').firstChild);
+        }
+        menu.clearMessage()
+    },
     generateBoard() {   //Генерируем поле (клетки)
         const a = document.querySelector('.board')
 
@@ -121,13 +175,12 @@ const generate = {
                 storage.arrayAttack[i][j] = 0
             }
         }
-
         generate.render()
     },
     render() {  //Размещаем фигуры на доске и записываем их положение
         //Смена сторон
         let a, b, c, d, k, q
-        if (setting.changeParties) {
+        if (menu.changeParties) {
             a = 0
             b = 7
             c = a + 1
@@ -274,7 +327,7 @@ const actions = {
 
 
                 } else { //Если выбрана фигура противоположной стороны
-                    return dom.outputMessage(`Ход ${move.sideMove? 'белых': 'черных'}`, 'span-orange')
+                    return menu.outputMessage(`Ход ${move.sideMove? 'белых': 'черных'}`, 'span-orange')
                 }
             }
         } else if (!this.choiceOrMove) { //Если режим 'перемещение фигуры'
@@ -289,12 +342,10 @@ const actions = {
                 move.row = row
                 move.col = col
                 move.selectedFigure = nameNewFigure
-
-                backlight.checking()
-
                 //Убираем/добавляем подсветку
                 backlight.spaces(namePastFigure, false)
                 backlight.space(row, col)
+                backlight.checking()
                 backlight.spaces(nameNewFigure)
 
             } else {    //Если кликнули по незанятой клетке или вражеской фигуре
@@ -325,9 +376,16 @@ const move = {
         backlight.spaces(nameFigure, false)
         //Меняем статус клика на выбор фигуры
         actions.choiceOrMove = true
+        backlight.checking()
 
     },
     moving(row, col, nameFigure, mod1) {//Перемещаем фигуру
+
+        if (history.shiftStatus) {
+            history.clear()
+            history.shiftStatus = false
+            history.save()
+        }
 
         //Удаляем фигуру из начальной позиции
         storage.arraySpace[this.row][this.col].innerHTML = ''
@@ -342,7 +400,7 @@ const move = {
         actions.choiceOrMove = true
         this.counter++
 
-        dom.outputMessage(`#${this.counter}: ${storage.nameFigure.get(this.selectedFigure.slice(0, -1))} ${storage.nameCol[this.col]
+        menu.outputMessage(`#${this.counter}: ${storage.nameFigure.get(this.selectedFigure.slice(0, -1))} ${storage.nameCol[this.col]
         + storage.nameRow[this.row] + ' ' + storage.nameCol[col] + storage.nameRow[row]}`)
         //Убираем подсветку возможных ходов
         backlight.spaces(nameFigure, false)
@@ -381,6 +439,7 @@ const move = {
         if (this.selectedFigure.search('King') !== -1) {
             backlight.crutchForKing = [row, col]
         }
+        backlight.checking()
         //Определяем возможные ходы фигур
         return possiblesMoves.preparation()
     },
@@ -452,7 +511,7 @@ const backlight = { //Подсветка клеток на поле
         posKing: [0, 0],
     },
     checking() {
-        if (move.counter > 1) {
+        if (move.counter > 1 || (history.shiftStatus && history.counter > 0)) {
             backlight.space(this.historyPos.pos1[0], this.historyPos.pos1[1], true, 'blue')
             backlight.space(this.historyPos.pos2[0], this.historyPos.pos2[1], true, 'blue')
         }
@@ -473,6 +532,13 @@ const backlight = { //Подсветка клеток на поле
                 storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.border = addOrRemove? 'orange solid 5px': 'none'
             } else {
                 storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.border = addOrRemove? 'red solid 5px': 'none'
+            }
+        }
+    },
+    clear() {
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                this.space(r, c, false)
             }
         }
     }
@@ -502,6 +568,9 @@ const possiblesMoves = {    //Определяем возможные ходы
         if (mod) {
             king.possiblesMoves()
             checkedMove.check()
+            if (!history.shiftStatus) {
+                history.save()
+            }
         }
     },
     //Заполняем карту возможных ходов для атаки
@@ -557,7 +626,7 @@ const possiblesMoves = {    //Определяем возможные ходы
 
 const pawn = {
     possibleMoves(row, col, name, mod) {  //Определяем возможные ходы для пешки
-        /* Если белые снизу - setting.changeParties, и выбранная фигура белая, то
+        /* Если белые снизу - menu.changeParties, и выбранная фигура белая, то
                 * модификатор поведения "-" - двигаемся по рядам со знаком минус
         * Если белые снизу и выбранная фигура черная, то
                 * "+"
@@ -571,8 +640,8 @@ const pawn = {
         let arrMove = []   //Собираю все возможные ходы перед тем как их добавить
         let arrMoveAttack = []  //Тут возможные ходы для атаки
         //Если белые снизу и белая фигура ИЛИ белые сверху и черная фигура, то
-        if ((setting.changeParties && colorName === 'w') ||
-            (!setting.changeParties && colorName === 'b')) {
+        if ((menu.changeParties && colorName === 'w') ||
+            (!menu.changeParties && colorName === 'b')) {
             modifierMove = -1
         } else {
             modifierMove = 1
@@ -951,7 +1020,7 @@ const king = {
                 // Если ладья не делала шаг
                 if (c) {
                     //Если белые снизу
-                    if (setting.changeParties) {
+                    if (menu.changeParties) {
                         let p
                         color? p = 7: p = 0
                         //Ладья1
@@ -1051,6 +1120,9 @@ const king = {
         }
     }
 }
+
+
+
 const checkedMove = {   //Определяем шаги, которые приводят к шаху для своего короля/
     //Шаги, которые спасают от шаха
     /*
@@ -1133,14 +1205,124 @@ const checkedMove = {   //Определяем шаги, которые прив
                 }
             }
         }
-        if (!counter) { //Если возможных ходов нет
-            dom.outputMessage(`#${move.counter}: ${
+        if (!counter && king.checkStatus) { //Если возможных ходов нет и королю шах
+            menu.outputMessage(`#${move.counter}: ${
                 move.sideMove? 'Королю белых шах и мат': 'Королю черных шах и мат'}`,
                 'span-red')
         } else if (king.checkStatus) { //Если королю шах
-            dom.outputMessage(`#${move.counter}: ${
+            menu.outputMessage(`#${move.counter}: ${
                 move.sideMove? 'Королю белых шах': 'Королю черных шах'}`,
                 'span-red')
+        } else if (!counter) {  //возможных ходов нет, шах не стоит. Пат
+            menu.outputMessage(`#${move.counter}: Пат`, 'span-red')
         }
+    }
+}
+
+
+
+const history = {
+    shiftStatus: false,
+    counterMax: -1,
+    counter: 0,
+    saves: {},
+    save() {
+        this.counterMax = move.counter - 1
+        this.saves[`save${move.counter}`] = {}
+        this.saves[`save${move.counter}`]['sideMove'] = move.sideMove
+        this.saves[`save${move.counter}`]['counter'] = move.counter
+        this.saves[`save${move.counter}`]['checkStatus'] = king.checkStatus
+        this.saves[`save${move.counter}`]['selectedFigure'] = move.selectedFigure
+        this.saves[`save${move.counter}`]['historyPos'] = {}
+        this.saves[`save${move.counter}`]['historyPos']['pos1'] = backlight.historyPos.pos1
+        this.saves[`save${move.counter}`]['historyPos']['pos2'] = backlight.historyPos.pos2
+        this.saves[`save${move.counter}`]['historyPos']['posKing'] = backlight.historyPos.posKing
+        this.saves[`save${move.counter}`]['outputMessageArr'] = menu.outputMessageArr.slice(0)
+        let a = [[], [], [], [], [], [], [], []]
+        checkedMove.copy(a, storage.arrayPositionFigure)
+        this.saves[`save${move.counter}`]['arrayPositionFigure'] = a
+        let b = new Map()
+        for (let n of storage.arrayPossibleMoves.keys()){
+            b.set(n, [])
+        }
+        this.saves[`save${move.counter}`]['arrayPossibleMoves'] = b
+        this.counterMax++
+        this.counter = this.counterMax
+        if (this.counter === 1) {
+            document.querySelector('#back').removeAttribute('disabled')
+        }
+        if (this.counter === this.counterMax) {
+            document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        }
+    },
+    back() {
+        this.shiftStatus = true
+        document.querySelector('#forward').removeAttribute('disabled')
+        if (this.counter <= 1) {
+            document.querySelector('#back').setAttribute('disabled', 'disabled')
+        } else {
+            document.querySelector('#back').removeAttribute('disabled')
+        }
+        if (this.counter > 0) {
+            this.counter--
+            this.replace(this.counter)
+            backlight.clear()
+            backlight.checking()
+        }
+    },
+    forward() {
+        this.shiftStatus = true
+        this.counter += 1
+        document.querySelector('#back').removeAttribute('disabled')
+        if (this.counter === this.counterMax) {
+            document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        } else {
+            document.querySelector('#forward').removeAttribute('disabled')
+        }
+        if (this.counter <= this.counterMax) {
+            this.replace(this.counter)
+            backlight.clear()
+            backlight.checking()
+        }
+    },
+    replace(counter) {
+        let a  = this.saves[`save${counter}`]
+        move.sideMove = a.sideMove
+        move.counter = a.counter
+        king.checkStatus = a.checkStatus
+        move.selectedFigure = a.selectedFigure
+        backlight.historyPos.pos1 = a.historyPos.pos1
+        backlight.historyPos.pos2 = a.historyPos.pos2
+        backlight.historyPos.posKing = a.historyPos.posKing
+        storage.arrayPositionFigure = a.arrayPositionFigure
+        storage.arrayPossibleMoves = new Map ()
+        for (let n of a.arrayPossibleMoves.keys()) {
+            storage.arrayPossibleMoves.set(n, [])
+        }
+        menu.outputMessageArr = a.outputMessageArr
+        this.render()
+    },
+    render() {
+        for (let r = 0; r < 8; r++) {
+            for (let c= 0; c < 8; c++) {
+                storage.arraySpace[r][c].innerHTML = ''
+                let a = storage.arrayPositionFigure[r][c]
+                if (a) {
+                    let b = a.split('')
+                    b.pop()
+                    b = b.join('')
+                    storage.arraySpace[r][c].innerHTML = storage.arrayFigureIcon.get(b)
+                }
+            }
+        }
+        menu.clearMessage()
+        menu.resetMessage()
+        possiblesMoves.preparation(true)
+    },
+    clear() {
+        for (let i = move.counter; i <= this.counterMax; i++) {
+            delete this.saves[`save${i}`]
+        }
+        this.counterMax = move.counter + 1
     }
 }
