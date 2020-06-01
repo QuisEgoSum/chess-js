@@ -63,7 +63,7 @@ const menu = {
         setTimeout(function () {
             document.querySelector('.board').classList.toggle('js-active')
         }, 1000)
-    },
+    }
 }
 
 const storage = {
@@ -1283,10 +1283,11 @@ const history = {
             delete this.saves[`save${i}`]
             localStorage.removeItem(`save${i}`)
         }
+        menu.outputMessageArr = []
         this.counterMax = move.counter - 1
     },
     recovery() {
-        if (localStorage.length !== 0) {
+        if (localStorage.length > 1) {
             for (let a = 0; a < localStorage.length; a++) {
                 let b = JSON.parse(localStorage.getItem(`save${a}`))
                 this.saves[`save${a}`] = {}
