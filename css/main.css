@@ -15,15 +15,35 @@
 
 .app {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  width: 602px;
-  height: 602px;
-  margin-top: 100px;
+  width: 627px;
+  height: 627px;
+  margin-top: 75px;
   position: relative;
+  transition: all 0.5s;
 }
 .app img {
   background: transparent;
+}
+
+.name-tile-left {
+  height: 602px;
+  width: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.name-tile-top {
+  display: flex;
+  height: 30px;
+  justify-content: space-around;
+  width: 602px;
+}
+.span-name {
+  font-size: 24px;
+  line-height: 24px;
+  display: block;
 }
 
 .board {
@@ -33,7 +53,6 @@
   height: 602px;
   border: #353e45 solid 1px;
   transition: all 0.5s;
-  opacity: 0;
 }
 
 .row {
@@ -113,8 +132,6 @@ button:active {
   font-size: 26px;
   line-height: 30px;
   transition: all 0.5s;
-  opacity: 0;
-  display: none;
 }
 .console .console-header {
   width: 100%;
@@ -175,13 +192,20 @@ button:active {
 }
 
 .control__wrapper-setting {
-  display: none;
-  opacity: 0;
   transition: all 0.5s;
 }
 
 .control__wrapper-menu {
   transition: all 0.5s;
+}
+
+.js-inactive {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.js-none {
+  display: none;
 }
 
 /*# sourceMappingURL=main.css.map */

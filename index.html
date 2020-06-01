@@ -10,8 +10,30 @@
 </head>
 <body>
     <section class="section">
-        <div class="app">
-            <div class="board" onmousedown="actions.click(event)"></div>
+        <div class="app js-inactive">
+            <div class="name-tile name-tile-left">
+                <div class="span-name span-name-left">8</div>
+                <div class="span-name span-name-left">7</div>
+                <div class="span-name span-name-left">6</div>
+                <div class="span-name span-name-left">5</div>
+                <div class="span-name span-name-left">4</div>
+                <div class="span-name span-name-left">3</div>
+                <div class="span-name span-name-left">2</div>
+                <div class="span-name span-name-left">1</div>
+            </div>
+            <div class="wrapper-app">
+                <div class="name-tile name-tile-top">
+                    <div class="span-name span-name-top">a</div>
+                    <div class="span-name span-name-top">b</div>
+                    <div class="span-name span-name-top">c</div>
+                    <div class="span-name span-name-top">d</div>
+                    <div class="span-name span-name-top">e</div>
+                    <div class="span-name span-name-top">f</div>
+                    <div class="span-name span-name-top">g</div>
+                    <div class="span-name span-name-top">h</div>
+                </div>
+                <div class="board" onmousedown="actions.click(event)"></div>
+            </div>
         </div>
         <div class="control">
             <div class="control__wrapper-menu">
@@ -22,15 +44,15 @@
                     <button id="setting" onclick="menu.openSetting()">Setting</button>
                 </div>
             </div>
-            <div class="control__wrapper-setting">
+            <div class="control__wrapper-setting js-inactive js-none">
                 <h2>Setting</h2>
                 <div class="button">
-                    <button onclick="menu.backToForSetting()">Back to menu</button>
+                    <button onclick="menu.closeSetting()">Back to menu</button>
                 </div>
             </div>
         </div>
-        <div class="console">
-            <button class="back-to-menu" onclick="menu.backToForGame()">Back to menu</button>
+        <div class="console js-inactive">
+            <button class="back-to-menu" onclick="menu.backToMenu()">Back to menu</button>
             <div class="wrapper-button-duo">
                 <button disabled id="back" onclick="history.back()">One step back</button>
                 <button disabled id="forward" onclick="history.forward()" title="Does not work">Forward</button>

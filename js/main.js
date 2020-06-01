@@ -11,44 +11,41 @@ const menu = {
         document.querySelector('#continue').removeAttribute('disabled')
     },
     continueGame() {
-        this.styles(['.console', 'block', '.board', 'block'], ['.control', 1])
-        setTimeout(function () {
-            menu.styles(['.control', 'none'], ['.board', 1, '.console', 1])
-        }, 500)
+        document.querySelector('.control').classList.toggle('js-inactive')
+        setTimeout(menu.game, 500)
     },
-    backToForGame() {
-        this.styles(['.control', 'block'], ['.board', 0, '.console', 0])
+    game() {
+        document.querySelector('.app').classList.toggle('js-inactive')
+        document.querySelector('.console').classList.toggle('js-inactive')
+    },
+    backToMenu() {
+        this.game()
         setTimeout(function () {
-            menu.styles(['.board', 'none', '.console', 'none'], ['.control', 1])
+            document.querySelector('.control').classList.toggle('js-inactive')
         }, 500)
     },
     openSetting() {
-        this.styles(['.control__wrapper-setting', 'block'], ['.control__wrapper-menu', 0])
+        document.querySelector('.control__wrapper-menu').classList.toggle('js-inactive')
+        document.querySelector('.control__wrapper-setting').classList.toggle('js-none')
         setTimeout(function () {
-            menu.styles(['.control__wrapper-menu', 'none'], ['.control__wrapper-setting', 1])
-        }, 500)
-    },
-    backToForSetting() {
-        this.styles(['.control__wrapper-menu', 'block'],
-                    ['.control__wrapper-setting', 0],
-                    ['.control__wrapper-menu', 'absolute'])
+            document.querySelector('.control__wrapper-menu').classList.toggle('js-none')
+            document.querySelector('.control__wrapper-setting').classList.toggle('js-inactive')
 
-        setTimeout(function () {
-            menu.styles(['.control__wrapper-setting', 'none'], ['.control__wrapper-menu', 1],
-                ['.control__wrapper-menu', 'relative'])
         }, 500)
     },
-    styles(display, opacity, position = false) {
-        for (let i = 0; i < display.length; i += 2) {
-            document.querySelector(`${display[i]}`).style.display = `${display[i + 1]}`
-        }
-        for (let i = 0; i < opacity.length; i += 2) {
-            document.querySelector(`${opacity[i]}`).style.opacity = `${opacity[i + 1]}`
-        }
-        if (position) {
-            document.querySelector(`${position[0]}`).style.position = `${position[1]}`
-        }
+    closeSetting() {
+        document.querySelector('.control__wrapper-setting').classList.toggle('js-inactive')
+        setTimeout(function () {
+            document.querySelector('.control__wrapper-menu').classList.toggle('js-none')
+            document.querySelector('.control__wrapper-setting').classList.toggle('js-none')
+            document.querySelector('.control__wrapper-menu').classList.toggle('js-inactive')
+
+        }, 500)
     },
+
+
+
+
     outputMessageArr: [],
     outputMessage(message, classHtml = 'span'){
         let messageHtml = `<span class=${classHtml} >${message}</span><br>`
@@ -133,6 +130,10 @@ const generate = {
             document.querySelector('.board').removeChild(document.querySelector('.board').firstChild);
         }
         menu.clearMessage()
+        history.saves = {}
+        history.counterMax = -1
+        document.querySelector('#back').setAttribute('disabled', 'disabled')
+        document.querySelector('#forward').setAttribute('disabled', 'disabled')
     },
     generateBoard() {   //Генерируем поле (клетки)
         const a = document.querySelector('.board')
@@ -711,6 +712,7 @@ const knight = {
                            *   Есть ли фигура-союзник, если да - исключить   */
 
         let arrMove = []   //Собираем возможные ходы
+        let arrAttack = []
         const colorName = name.charAt(0)
 
         const arrPossible = [
@@ -730,6 +732,8 @@ const knight = {
             let b = arrPossible[i][1]
             //Если координаты входят в пределы игрового поля
             if (a <= 7 && a >= 0 && b <= 7 && b >= 0) {
+                arrAttack.push([a, b])
+
                 //Смотрим что находится в выбранной клетке
                 let c = storage.arrayPositionFigure[a][b]
                 //И если по этим координатам нет фигуры ИЛИ есть вражеская
@@ -744,7 +748,7 @@ const knight = {
             storage.arrayPossibleMoves.set(name, arrMove)
         }
 
-        possiblesMoves.attackMap(arrMove, colorName, mod)
+        possiblesMoves.attackMap(arrAttack, colorName, mod)
     }
 }
 
@@ -784,6 +788,7 @@ const bishopCastleQueen = {
 
         //Собираем возможные ходы
         let arrMove = []
+        let arrAttack = []
         //Для слона и ладьи выполнять код нужно только раз, а для дамы - два (оба варианта)
         for (let q = 0; q < 2; q++) {
             if (nameFigure === 'Castle') {
@@ -816,6 +821,9 @@ const bishopCastleQueen = {
                         row + w <= 7 &&
                         col + s >= 0 &&
                         col + s <= 7)   {
+
+                        arrAttack.push([row + w, col + s])
+
                         //Смотрим что находится в выбранной клетке
                         let a
                         if (mod) {
@@ -865,7 +873,7 @@ const bishopCastleQueen = {
             //Добавляем все возможные ходы
             storage.arrayPossibleMoves.set(name, arrMove)
         }
-        possiblesMoves.attackMap(arrMove, colorName, mod)
+        possiblesMoves.attackMap(arrAttack, colorName, mod)
     }
 }
 
