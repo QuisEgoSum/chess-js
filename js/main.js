@@ -2,8 +2,6 @@
 //Жизнь запутана и ветвиста, как строки моего кода
 
 const menu = {
-    //Начальное положение сторон true - белые внизу
-    changeParties: true,
     newGame() {
         this.continueGame()
         generate.clear()
@@ -19,7 +17,6 @@ const menu = {
         document.querySelector('.console').classList.toggle('js-inactive')
     },
     backToMenu() {
-        this.border()
         this.game()
         setTimeout(function () {
             document.querySelector('.control').classList.toggle('js-inactive')
@@ -138,8 +135,9 @@ const generate = {
         history.counterMax = -1
         document.querySelector('#back').setAttribute('disabled', 'disabled')
         document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        localStorage.clear()
     },
-    generateBoard() {   //Генерируем поле (клетки)
+    generateBoard(mod = true) {   //Генерируем поле (клетки)
         const a = document.querySelector('.board')
 
         for (let i = 0; i < 8; i++) {
@@ -173,6 +171,9 @@ const generate = {
 
                     }
                 }
+                //data-*
+                document.querySelectorAll('.row')[i].children[j].dataset.x = `${i}`
+                document.querySelectorAll('.row')[i].children[j].dataset.y = `${j}`
                 //Заполняет массив arraySpace всеми элементами поля
                 storage.arraySpace[i].push(document.querySelectorAll('.row')[i].children[j])
                 //Заполняет массивы arrayAttack, arrayPositionFigure '0'
@@ -180,26 +181,19 @@ const generate = {
                 storage.arrayAttack[i][j] = 0
             }
         }
-        generate.render()
+        if (mod) {
+            generate.render()
+        }
     },
     render() {  //Размещаем фигуры на доске и записываем их положение
-        //Смена сторон
         let a, b, c, d, k, q
-        if (menu.changeParties) {
             a = 0
             b = 7
             c = a + 1
             d = b - 1
             k = 4
             q = 3
-        } else {
-            a = 7
-            b = 0
-            c = a - 1
-            d = b + 1
-            k = 3
-            q = 4
-        }
+
         for (let i = 0; i < 8; i++) {
             //Пешки
             //Размещаем на поле
@@ -293,47 +287,34 @@ const actions = {
             //Сохраняем блок по которому кликнули
             g = e.target
         }
-        let row //Хранит ряд элемента по которому кликнули
-        let col //Хранит элемент в ряду по которому кликнули
-        //Ищем выбранную клетку
-        for (let i = 0; i < 8; i++) {
-            //Находим элемент, сохраняем его ряд и номер
-            if (storage.arraySpace[i].indexOf(g) !== -1) {
-                row = i
-                col = storage.arraySpace[i].indexOf(g)
-            }
-        }
+        let row = Number(g.dataset.x)
+        let col = Number(g.dataset.y)
         this.$or(row, col)
     },
     //Определяем что делать с выбранной клеткой
     $or(row, col) {
-        //Если режим выбора фигуры
-        if (this.choiceOrMove) {
-            //И если в выбранной клетке есть фигура
-            if (storage.arrayPositionFigure[row][col]) {
-                //И если выбранная фигура той стороны, чей ход
-                if (storage.arrayPositionFigure[row][col].search(`${move.sideMove? 'white': 'black'}`) === 0) {
-                    //Сохраняем координаты и имя выбранной фигуры
-                    move.row = row
-                    move.col = col
-                    move.selectedFigure = storage.arrayPositionFigure[row][col]
+        //Если режим выбора фигуры //И если в выбранной клетке есть фигура
+        if (this.choiceOrMove && storage.arrayPositionFigure[row][col]) {
+            //И если выбранная фигура той стороны, чей ход
+            if (storage.arrayPositionFigure[row][col].search(`${move.sideMove? 'white': 'black'}`) === 0) {
+                //Сохраняем координаты и имя выбранной фигуры
+                move.row = row
+                move.col = col
+                move.selectedFigure = storage.arrayPositionFigure[row][col]
 
-                    //Лечение перетирания подсвеченных клеток
-                    backlight.checking()
+                //Лечение перетирания подсвеченных клеток
+                backlight.checking()
 
-                    //Меняем статус на перемещение
-                    this.choiceOrMove = false
+                //Меняем статус на перемещение
+                this.choiceOrMove = false
 
-                    //Подсвечиваем на доске выбранную фигуру
-                    backlight.space(row, col)
-                    //Подсвечиваем возможные ходы
-                    backlight.spaces(move.selectedFigure)
+                //Подсвечиваем на доске выбранную фигуру
+                backlight.space(row, col)
+                //Подсвечиваем возможные ходы
+                backlight.spaces(move.selectedFigure)
 
-
-
-                } else { //Если выбрана фигура противоположной стороны
-                    return menu.outputMessage(`Ход ${move.sideMove? 'белых': 'черных'}`, 'span-orange')
-                }
+            } else { //Если выбрана фигура противоположной стороны
+                return menu.outputMessage(`Ход ${move.sideMove? 'белых': 'черных'}`, 'span-orange')
             }
         } else if (!this.choiceOrMove) { //Если режим 'перемещение фигуры'
             //Убираем подсветку выбранной фигуры (в любом случае)
@@ -472,7 +453,7 @@ const move = {
         storage.arraySpace[r][c].innerHTML = storage.arrayFigureIcon.get(newName)
         storage.arrayPositionFigure[r][c] = `${newName + i}`
         storage.arrayPossibleMoves.set(`${newName + i}`, [])
-        i++
+        color.charAt(0) === 'w'? this.$exchangeCounter[0]++: this.$exchangeCounter[1]++
 
     },
     //Если ходим королем или ладьёй, меняем флаг
@@ -516,27 +497,27 @@ const backlight = { //Подсветка клеток на поле
         posKing: [0, 0],
     },
     checking() {
+        if (king.checkStatus && move.selectedFigure.search(`${move.sideMove? 'whiteKing': 'blackKing'}`) === -1) {
+            backlight.space(this.historyPos.posKing[0], this.historyPos.posKing[1], true, 'red')
+        }
         if (move.counter > 1 || (history.shiftStatus && history.counter > 0)) {
             backlight.space(this.historyPos.pos1[0], this.historyPos.pos1[1], true, 'blue')
             backlight.space(this.historyPos.pos2[0], this.historyPos.pos2[1], true, 'blue')
-        }
-        if (king.checkStatus && move.selectedFigure.search(`${move.sideMove? 'whiteKing': 'blackKing'}`) === -1) {
-            backlight.space(this.historyPos.posKing[0], this.historyPos.posKing[1], true, 'red')
         }
     },
     //Добавляем/удаляем подсветку для клетки, row, col - ряд и колонка нужной клетки
     //addOrRemove true/false - добавляем/удаляем, color - цвет рамки
     space(row, col, addOrRemove = true, color = 'green') {
-        storage.arraySpace[row][col].style.border = addOrRemove? `${color} solid 5px`: 'none'
+        storage.arraySpace[row][col].style.borderColor = addOrRemove? `${color}`: 'transparent'
     },
     //Подсветка возможных ходов
     spaces(name, addOrRemove = true) {
         const arrMove = storage.arrayPossibleMoves.get(name)
         for (let i = 0; i < arrMove.length; i++) {
             if (arrMove[i][3]) {
-                storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.border = addOrRemove? 'orange solid 5px': 'none'
+                storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.borderColor = addOrRemove? 'orange': 'transparent'
             } else {
-                storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.border = addOrRemove? 'red solid 5px': 'none'
+                storage.arraySpace[arrMove[i][0]][arrMove[i][1]].style.borderColor = addOrRemove? 'red': 'transparent'
             }
         }
     },
@@ -631,7 +612,7 @@ const possiblesMoves = {    //Определяем возможные ходы
 
 const pawn = {
     possibleMoves(row, col, name, mod) {  //Определяем возможные ходы для пешки
-        /* Если белые снизу - menu.changeParties, и выбранная фигура белая, то
+        /* Если белые снизу - menu.changeParties(***убрал эту переменную), и выбранная фигура белая, то
                 * модификатор поведения "-" - двигаемся по рядам со знаком минус
         * Если белые снизу и выбранная фигура черная, то
                 * "+"
@@ -645,8 +626,7 @@ const pawn = {
         let arrMove = []   //Собираю все возможные ходы перед тем как их добавить
         let arrMoveAttack = []  //Тут возможные ходы для атаки
         //Если белые снизу и белая фигура ИЛИ белые сверху и черная фигура, то
-        if ((menu.changeParties && colorName === 'w') ||
-            (!menu.changeParties && colorName === 'b')) {
+        if (colorName === 'w') {
             modifierMove = -1
         } else {
             modifierMove = 1
@@ -932,14 +912,13 @@ const king = {
                 *   то мат
                 * */
 
-
         let wK = 'whiteKing$'
         let bK = 'blackKing$'
 
         storage.arrayPossibleMoves.set (wK, [])
         storage.arrayPossibleMoves.set (bK, [])
 
-        //Определяем местоположение королей
+        //Определяем местоположение королей (было бы разумней хранить положение фигур в ассоциативном массиве...)
         let wRow
         let bRow
         let wCol
@@ -1034,56 +1013,12 @@ const king = {
             for (let z = 0, c = c1; z < 2; z++, c = c2) {
                 // Если ладья не делала шаг
                 if (c) {
-                    //Если белые снизу
-                    if (menu.changeParties) {
-                        let p
-                        color? p = 7: p = 0
-                        //Ладья1
-                        if (z === 0) {
-                            //Проверяем есть ли фигуры между королем и ладъёй
-                            if (freeTile([[p, 1],[p, 2],[p, 3]])) {
-                                //Пушим возможный ход в массив для соответствующего по цвету короля
-                                if (color) {
-                                    //С первым флагом false, чтобы ход "рокировку" обработать отдельно
-                                    //второй флаг для ходов короля всегда true
-                                    wArr.push([p, 2, false, true])
-                                } else {
-                                    bArr.push([p, 2, false, true])
-                                }
-                            }
-                        //Ладья2
-                        } else {
-                            if (freeTile([[p, 5],[p, 6]])) {
-                                if (color) {
-                                    wArr.push([p, 6, false, true])
-                                } else {
-                                    bArr.push([p, 6, false, true])
-                                }
-                            }
-                        }
-                    //Белые сверху
-                    } else {
-                        let p
-                        color? p = 0: p = 7
-                        //Ладья1
-                        if (z === 0) {
-                            if (freeTile([[p, 1],[p, 2]])) {
-                                if (color) {
-                                    wArr.push([p, 1, false, true])
-                                } else {
-                                    bArr.push([p, 1, false, true])
-                                }
-                            }
-                            //Ладья2
-                        } else {
-                            if (freeTile([[p, 4],[p, 5],[p, 6]])) {
-                                if (color) {
-                                    wArr.push([p, 5, false, true])
-                                } else {
-                                    bArr.push([p, 5, false, true])
-                                }
-                            }
-                        }
+                    let p, q, l
+                    color? p = 7: p = 0;
+                    (z === 0)? q = freeTile([[p, 1],[p, 2],[p, 3]]): q = freeTile([[p, 5],[p, 6]]);
+                    (z === 0)? l = 2: l = 6
+                    if (q) {
+                        color? wArr.push([p, l, false, true]): bArr.push([p, l, false, true])
                     }
                 }
             }
@@ -1104,8 +1039,7 @@ const king = {
             }
         }
         //Добавляем ходы
-        storage.arrayPossibleMoves.set(wK, wArr)
-        storage.arrayPossibleMoves.set(bK, bArr)
+        move.sideMove? storage.arrayPossibleMoves.set(wK, wArr): storage.arrayPossibleMoves.set(bK, bArr)
     },
     checkStatus: false,//true - стоит шах
     //Определяем стоит ли шах
@@ -1146,7 +1080,7 @@ const checkedMove = {   //Определяем шаги, которые прив
             *   Теперь, когда мы получили карту расположения всех фигур, к ней нужно применить поочередно каждый
             *   возможный ход нужной стороны и для измененной карты определить возможные ходы вражеской стороны
             *   Благо для этой цели можно переиспользовать уже созданные мной методы определения возможных ходов
-            *   после внесения в них небольших корректировок (mod)
+            *   после внесения в них небольших корректировок (***mod)
                 *   Теперь нужно проверить, если для текущего положения короля на этой карте есть угроза
                     *   перезаписать ход со 2-м флагом false
                 *   Если нет, перезаписать с флагом true
@@ -1242,7 +1176,7 @@ const history = {
     counter: 0,
     saves: {},
     save() {
-        this.counterMax = move.counter - 1
+        this.counterMax++
         this.saves[`save${move.counter}`] = {}
         this.saves[`save${move.counter}`]['sideMove'] = move.sideMove
         this.saves[`save${move.counter}`]['counter'] = move.counter
@@ -1253,22 +1187,27 @@ const history = {
         this.saves[`save${move.counter}`]['historyPos']['pos2'] = backlight.historyPos.pos2
         this.saves[`save${move.counter}`]['historyPos']['posKing'] = backlight.historyPos.posKing
         this.saves[`save${move.counter}`]['outputMessageArr'] = menu.outputMessageArr.slice(0)
+        this.saves[`save${move.counter}`]['castling'] = {}
+        this.saves[`save${move.counter}`]['castling']['blackKing$'] = king.castling.blackKing$
+        this.saves[`save${move.counter}`]['castling']['whiteKing$'] = king.castling.whiteKing$
+        this.saves[`save${move.counter}`]['castling']['blackCastle1'] = king.castling.blackCastle1
+        this.saves[`save${move.counter}`]['castling']['blackCastle2'] = king.castling.blackCastle2
+        this.saves[`save${move.counter}`]['castling']['whiteCastle1'] = king.castling.whiteCastle1
+        this.saves[`save${move.counter}`]['castling']['whiteCastle2'] = king.castling.whiteCastle2
         let a = [[], [], [], [], [], [], [], []]
         checkedMove.copy(a, storage.arrayPositionFigure)
         this.saves[`save${move.counter}`]['arrayPositionFigure'] = a
-        let b = new Map()
+        let b = []
         for (let n of storage.arrayPossibleMoves.keys()){
-            b.set(n, [])
+            b.push(n)
         }
         this.saves[`save${move.counter}`]['arrayPossibleMoves'] = b
-        this.counterMax++
         this.counter = this.counterMax
         if (this.counter === 1) {
             document.querySelector('#back').removeAttribute('disabled')
         }
-        if (this.counter === this.counterMax) {
-            document.querySelector('#forward').setAttribute('disabled', 'disabled')
-        }
+        document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        localStorage.setItem(`save${move.counter}`, JSON.stringify(this.saves[`save${move.counter}`]))
     },
     back() {
         this.shiftStatus = true
@@ -1310,8 +1249,14 @@ const history = {
         backlight.historyPos.pos2 = a.historyPos.pos2
         backlight.historyPos.posKing = a.historyPos.posKing
         storage.arrayPositionFigure = a.arrayPositionFigure
+        king.castling.blackKing$ = a.castling.blackKing$
+        king.castling.whiteKing$ = a.castling.whiteKing$
+        king.castling.blackCastle1 = a.castling.blackCastle1
+        king.castling.blackCastle2 = a.castling.blackCastle2
+        king.castling.whiteCastle1 = a.castling.whiteCastle1
+        king.castling.whiteCastle2 = a.castling.whiteCastle2
         storage.arrayPossibleMoves = new Map ()
-        for (let n of a.arrayPossibleMoves.keys()) {
+        for (let n of a.arrayPossibleMoves) {
             storage.arrayPossibleMoves.set(n, [])
         }
         menu.outputMessageArr = a.outputMessageArr
@@ -1321,9 +1266,8 @@ const history = {
         for (let r = 0; r < 8; r++) {
             for (let c= 0; c < 8; c++) {
                 storage.arraySpace[r][c].innerHTML = ''
-                let a = storage.arrayPositionFigure[r][c]
-                if (a) {
-                    let b = a.split('')
+                if (storage.arrayPositionFigure[r][c]) {
+                    let b = storage.arrayPositionFigure[r][c].split('')
                     b.pop()
                     b = b.join('')
                     storage.arraySpace[r][c].innerHTML = storage.arrayFigureIcon.get(b)
@@ -1337,7 +1281,24 @@ const history = {
     clear() {
         for (let i = move.counter; i <= this.counterMax; i++) {
             delete this.saves[`save${i}`]
+            localStorage.removeItem(`save${i}`)
         }
-        this.counterMax = move.counter + 1
+        this.counterMax = move.counter - 1
+    },
+    recovery() {
+        if (localStorage.length !== 0) {
+            for (let a = 0; a < localStorage.length; a++) {
+                let b = JSON.parse(localStorage.getItem(`save${a}`))
+                this.saves[`save${a}`] = {}
+                this.saves[`save${a}`] = b
+            }
+            generate.generateBoard(false)
+            this.counterMax = localStorage.length - 2
+            this.replace(this.counterMax + 1)
+            backlight.checking()
+            document.querySelector('#continue').removeAttribute('disabled')
+            document.querySelector('#back').removeAttribute('disabled')
+        }
     }
 }
+history.recovery()
