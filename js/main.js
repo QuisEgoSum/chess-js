@@ -19,33 +19,12 @@ const menu = {
         document.querySelector('.console').classList.toggle('js-inactive')
     },
     backToMenu() {
+        this.border()
         this.game()
         setTimeout(function () {
             document.querySelector('.control').classList.toggle('js-inactive')
         }, 500)
     },
-    openSetting() {
-        document.querySelector('.control__wrapper-menu').classList.toggle('js-inactive')
-        document.querySelector('.control__wrapper-setting').classList.toggle('js-none')
-        setTimeout(function () {
-            document.querySelector('.control__wrapper-menu').classList.toggle('js-none')
-            document.querySelector('.control__wrapper-setting').classList.toggle('js-inactive')
-
-        }, 500)
-    },
-    closeSetting() {
-        document.querySelector('.control__wrapper-setting').classList.toggle('js-inactive')
-        setTimeout(function () {
-            document.querySelector('.control__wrapper-menu').classList.toggle('js-none')
-            document.querySelector('.control__wrapper-setting').classList.toggle('js-none')
-            document.querySelector('.control__wrapper-menu').classList.toggle('js-inactive')
-
-        }, 500)
-    },
-
-
-
-
     outputMessageArr: [],
     outputMessage(message, classHtml = 'span'){
         let messageHtml = `<span class=${classHtml} >${message}</span><br>`
@@ -62,7 +41,32 @@ const menu = {
             let messageHtml = `<span class=${this.outputMessageArr[i + 1]} >${this.outputMessageArr[i]}</span><br>`
             document.querySelector('.output').insertAdjacentHTML('afterbegin', `${messageHtml}`)
         }
-    }
+    },
+    flip(e) {
+        if (!Number(e.target.dataset.counter)) {
+            document.querySelector('.board').style.transform = 'rotate(180deg)'
+            document.querySelector('.name-tile-top').style.flexDirection = 'row-reverse'
+            document.querySelector('.name-tile-left').style.flexDirection = 'column-reverse'
+            e.target.dataset.counter = '1'
+        } else if (Number(e.target.dataset.counter)) {
+            document.querySelector('.board').style.transform = 'rotate(0deg)'
+            document.querySelector('.name-tile-top').style.flexDirection = 'row'
+            document.querySelector('.name-tile-left').style.flexDirection = 'column'
+            e.target.dataset.counter = '0'
+        }
+
+        document.querySelector('.board').classList.toggle('js-active')
+        setTimeout(function () {
+            for (let a of storage.arraySpace) {
+                for (let s of a) {
+                    s.classList.toggle('js-flip')
+                }
+            }
+        }, 500)
+        setTimeout(function () {
+            document.querySelector('.board').classList.toggle('js-active')
+        }, 1000)
+    },
 }
 
 const storage = {
@@ -822,7 +826,6 @@ const bishopCastleQueen = {
                         col + s >= 0 &&
                         col + s <= 7)   {
 
-                        arrAttack.push([row + w, col + s])
 
                         //Смотрим что находится в выбранной клетке
                         let a
@@ -836,13 +839,17 @@ const bishopCastleQueen = {
                             //Добавляем возможный ход
                             arrMove.push([row + w, col + s, true])
                             //Если есть вражеская фигура
+                            arrAttack.push([row + w, col + s])
                         } else if (a.charAt(0) !== colorName) {
+                            arrAttack.push([row + w, col + s])
                             //Добавляем возможный ход
                             arrMove.push([row + w, col + s, true])
                             //И выходим из цикла, иначе мы перепрыгнем фигуру
                             break
                             //Если фигура союзник
                         } else {
+                            //Только для attack map, чтобы исключить для короля
+                            arrAttack.push([row + w, col + s])
                             //Выходим из цикла, иначе мы перепрыгнем фигуру
                             break
                         }

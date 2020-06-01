@@ -36,18 +36,11 @@
             </div>
         </div>
         <div class="control">
-            <div class="control__wrapper-menu">
+            <div class="wrapper-control">
                 <h2>Chess</h2>
                 <div class="button">
                     <button id ='continue' disabled onclick="menu.continueGame()">Continue</button>
                     <button id='start' title="Start a new game" onclick="menu.newGame()">New Game</button>
-                    <button id="setting" onclick="menu.openSetting()">Setting</button>
-                </div>
-            </div>
-            <div class="control__wrapper-setting js-inactive js-none">
-                <h2>Setting</h2>
-                <div class="button">
-                    <button onclick="menu.closeSetting()">Back to menu</button>
                 </div>
             </div>
         </div>
@@ -57,6 +50,7 @@
                 <button disabled id="back" onclick="history.back()">One step back</button>
                 <button disabled id="forward" onclick="history.forward()" title="Does not work">Forward</button>
             </div>
+            <button class="flip" data-counter="0" onclick="menu.flip(event)">&#8661; Flip over board</button>
             <div class="log">
                 <div class="console-header">Console</div>
                 <div class="output"></div>
