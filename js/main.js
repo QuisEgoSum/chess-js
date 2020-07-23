@@ -133,6 +133,10 @@ const generate = {
         menu.clearMessage()
         history.saves = {}
         history.counterMax = -1
+        menu.outputMessageArr = []
+        for (let k of Object.keys(king.castling)) {
+            king.castling[k] = false
+        }
         document.querySelector('#back').setAttribute('disabled', 'disabled')
         document.querySelector('#forward').setAttribute('disabled', 'disabled')
         localStorage.clear()
@@ -1186,7 +1190,7 @@ const history = {
         this.saves[`save${move.counter}`]['historyPos']['pos1'] = backlight.historyPos.pos1
         this.saves[`save${move.counter}`]['historyPos']['pos2'] = backlight.historyPos.pos2
         this.saves[`save${move.counter}`]['historyPos']['posKing'] = backlight.historyPos.posKing
-        this.saves[`save${move.counter}`]['outputMessageArr'] = menu.outputMessageArr.slice(0)
+        this.saves[`save${move.counter}`]['outputMessageArr'] = menu.outputMessageArr.slice()
         this.saves[`save${move.counter}`]['castling'] = {}
         this.saves[`save${move.counter}`]['castling']['blackKing$'] = king.castling.blackKing$
         this.saves[`save${move.counter}`]['castling']['whiteKing$'] = king.castling.whiteKing$
@@ -1259,7 +1263,7 @@ const history = {
         for (let n of a.arrayPossibleMoves) {
             storage.arrayPossibleMoves.set(n, [])
         }
-        menu.outputMessageArr = a.outputMessageArr
+        menu.outputMessageArr = a.outputMessageArr.slice()
         this.render()
     },
     render() {
@@ -1279,11 +1283,11 @@ const history = {
         possiblesMoves.preparation(true)
     },
     clear() {
-        for (let i = move.counter; i <= this.counterMax; i++) {
+        for (let i = move.counter + 1; i <= this.counterMax; i++) {
             delete this.saves[`save${i}`]
             localStorage.removeItem(`save${i}`)
         }
-        menu.outputMessageArr = []
+        // menu.outputMessageArr = []
         this.counterMax = move.counter - 1
     },
     recovery() {
