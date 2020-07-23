@@ -785,7 +785,6 @@ const bishopCastleQueen = {
             for (let k = 0; k < 4; k++) {   //4 направления движения
 
                 let w, s
-
                 if (k === 0) {
                     if (q === 0) { w = 1  ; s = 1  }   else
                     if (q === 1) { w = 1  ; s = 0  }
@@ -802,14 +801,13 @@ const bishopCastleQueen = {
                     if (q === 0) { w = -1 ; s = -1 }   else
                     if (q === 1) { w = 0  ; s = -1 }
                 }
-                let temp = true
+                let tmp = false
                 for (let i = 1; i < 8; i++) {   //7 - максимальное число ходов в одном направлении
                     //Если координаты входят в пределы игрового поля
                     if (row + w >= 0 &&
                         row + w <= 7 &&
                         col + s >= 0 &&
                         col + s <= 7)   {
-
 
                         //Смотрим что находится в выбранной клетке
                         let a
@@ -824,37 +822,62 @@ const bishopCastleQueen = {
                             arrMove.push([row + w, col + s, true])
                             //Если есть вражеская фигура
                             arrAttack.push([row + w, col + s])
-                        } else if (a.charAt(0) !== colorName) {
-                            if (temp && a.search('King') !== -1) {
-                                arrAttack.push([row + w, col + s])
+                            if (tmp) {
+                                break
                             }
+                        } else if (a.charAt(0) !== colorName) {
                             //Добавляем возможный ход
                             arrMove.push([row + w, col + s, true])
-
+                            arrAttack.push([row + w, col + s])
+                            //~~~
+                            if (tmp) {
+                                break
+                            }
+                            if (a.search('King') === -1) {
+                                break
+                            } else if (a.search('King') !== -1) {
+                                tmp = true
+                            }
                             //Если фигура союзник
                         } else {
                             //Только для attack map, чтобы исключить для короля
                             arrAttack.push([row + w, col + s])
+                            if (tmp) {
+                                break
+                            }
                             //Выходим из цикла, иначе мы перепрыгнем фигуру
                             break
                         }
 
                         if (k === 0) {
-                            if (q === 0) { w++; s++ }  else
-                            if (q === 1) { w++      }
+                            q === 0 ? w++ && s++ : w++
                         } else
                         if (k === 1) {
-                            if (q === 0) { w++; s-- }  else
-                            if (q === 1) { w--      }
+                            q === 0 ? w++ && s-- : w--
                         } else
                         if (k === 2) {
-                            if (q === 0) { w--; s++ }  else
-                            if (q === 1) { s++      }
+                            q === 0 ? w-- && s++ : s++
                         } else
                         if (k === 3) {
-                            if (q === 0) { w--; s-- }  else
-                            if (q === 1) { s--      }
+                            q === 0 ? w-- && s-- : s--
                         }
+
+                        // if (k === 0) {
+                        //     if (q === 0) { w++; s++ }  else
+                        //     if (q === 1) { w++      }
+                        // } else
+                        // if (k === 1) {
+                        //     if (q === 0) { w++; s-- }  else
+                        //     if (q === 1) { w--      }
+                        // } else
+                        // if (k === 2) {
+                        //     if (q === 0) { w--; s++ }  else
+                        //     if (q === 1) { s++      }
+                        // } else
+                        // if (k === 3) {
+                        //     if (q === 0) { w--; s-- }  else
+                        //     if (q === 1) { s--      }
+                        // }
                     }
                 }
             }
