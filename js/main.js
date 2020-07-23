@@ -135,7 +135,7 @@ const generate = {
         history.counterMax = -1
         menu.outputMessageArr = []
         for (let k of Object.keys(king.castling)) {
-            king.castling[k] = false
+            king.castling[k] = true
         }
         document.querySelector('#back').setAttribute('disabled', 'disabled')
         document.querySelector('#forward').setAttribute('disabled', 'disabled')
