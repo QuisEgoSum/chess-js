@@ -9,28 +9,28 @@
     <link rel="stylesheet" href="css/main.css" type="text/css">
 </head>
 <body>
-    <section class="section">
+    <main class="main">
         <div class="app js-inactive">
-            <div class="name-tile name-tile-left">
-                <div class="span-name span-name-left">8</div>
-                <div class="span-name span-name-left">7</div>
-                <div class="span-name span-name-left">6</div>
-                <div class="span-name span-name-left">5</div>
-                <div class="span-name span-name-left">4</div>
-                <div class="span-name span-name-left">3</div>
-                <div class="span-name span-name-left">2</div>
-                <div class="span-name span-name-left">1</div>
+            <div class="name-tile name-tile__left">
+                <div class="name-tile_item">8</div>
+                <div class="name-tile_item">7</div>
+                <div class="name-tile_item">6</div>
+                <div class="name-tile_item">5</div>
+                <div class="name-tile_item">4</div>
+                <div class="name-tile_item">3</div>
+                <div class="name-tile_item">2</div>
+                <div class="name-tile_item">1</div>
             </div>
             <div class="wrapper-app">
-                <div class="name-tile name-tile-top">
-                    <div class="span-name span-name-top">a</div>
-                    <div class="span-name span-name-top">b</div>
-                    <div class="span-name span-name-top">c</div>
-                    <div class="span-name span-name-top">d</div>
-                    <div class="span-name span-name-top">e</div>
-                    <div class="span-name span-name-top">f</div>
-                    <div class="span-name span-name-top">g</div>
-                    <div class="span-name span-name-top">h</div>
+                <div class="name-tile name-tile__top">
+                    <div class="name-tile_item">a</div>
+                    <div class="name-tile_item">b</div>
+                    <div class="name-tile_item">c</div>
+                    <div class="name-tile_item">d</div>
+                    <div class="name-tile_item">e</div>
+                    <div class="name-tile_item">f</div>
+                    <div class="name-tile_item">g</div>
+                    <div class="name-tile_item">h</div>
                 </div>
                 <div class="board" onclick="actions.click(event)"></div>
             </div>
@@ -48,7 +48,7 @@
             <button class="back-to-menu" onclick="menu.backToMenu()">Back to menu</button>
             <div class="wrapper-button-duo">
                 <button disabled id="back" onclick="history.back()">One step back</button>
-                <button disabled id="forward" onclick="history.forward()" title="Does not work">Forward</button>
+                <button disabled id="forward" onclick="history.forward()">Forward</button>
             </div>
             <button class="flip" data-counter="0" onclick="menu.flip(event)">&#8661; Flip over board</button>
             <div class="log">
@@ -56,7 +56,7 @@
                 <div class="output"></div>
             </div>
         </div>
-    </section>
+    </main>
     <script rel="script" src="js/main.js" type="text/javascript"></script>
 </body>
 </html>

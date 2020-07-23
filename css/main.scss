@@ -1,18 +1,24 @@
-*, body {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   outline: none;
   background: #97a3a5;
+
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
-.section {
+
+
+.main {
   display: flex;
   max-width: 1200px;
   margin: auto;
   justify-content: center;
 }
-
-
 
 .app {
   display: flex;
@@ -30,26 +36,20 @@
 .name-tile {
   transition: all 0.5s;
 }
-.name-tile-left{
+.name-tile__left{
   height: 602px;
   width: 25px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  .span-name-left {
-
-  }
 }
-.name-tile-top {
+.name-tile__top {
   display: flex;
   height: 30px;
   justify-content: space-around;
   width: 602px;
-  .span-name-top {
-
-  }
 }
-.span-name {
+.name-tile_item {
   font-size: 24px;
   line-height: 24px;
   display: block;

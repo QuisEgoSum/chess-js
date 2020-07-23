@@ -42,13 +42,13 @@ const menu = {
     flip(e) {
         if (!Number(e.target.dataset.counter)) {
             document.querySelector('.board').style.transform = 'rotate(180deg)'
-            document.querySelector('.name-tile-top').style.flexDirection = 'row-reverse'
-            document.querySelector('.name-tile-left').style.flexDirection = 'column-reverse'
+            document.querySelector('.name-tile__top').style.flexDirection = 'row-reverse'
+            document.querySelector('.name-tile__left').style.flexDirection = 'column-reverse'
             e.target.dataset.counter = '1'
         } else if (Number(e.target.dataset.counter)) {
             document.querySelector('.board').style.transform = 'rotate(0deg)'
-            document.querySelector('.name-tile-top').style.flexDirection = 'row'
-            document.querySelector('.name-tile-left').style.flexDirection = 'column'
+            document.querySelector('.name-tile__top').style.flexDirection = 'row'
+            document.querySelector('.name-tile__left').style.flexDirection = 'column'
             e.target.dataset.counter = '0'
         }
 
@@ -802,7 +802,7 @@ const bishopCastleQueen = {
                     if (q === 0) { w = -1 ; s = -1 }   else
                     if (q === 1) { w = 0  ; s = -1 }
                 }
-
+                let temp = true
                 for (let i = 1; i < 8; i++) {   //7 - максимальное число ходов в одном направлении
                     //Если координаты входят в пределы игрового поля
                     if (row + w >= 0 &&
@@ -825,11 +825,12 @@ const bishopCastleQueen = {
                             //Если есть вражеская фигура
                             arrAttack.push([row + w, col + s])
                         } else if (a.charAt(0) !== colorName) {
-                            arrAttack.push([row + w, col + s])
+                            if (temp && a.search('King') !== -1) {
+                                arrAttack.push([row + w, col + s])
+                            }
                             //Добавляем возможный ход
                             arrMove.push([row + w, col + s, true])
-                            //И выходим из цикла, иначе мы перепрыгнем фигуру
-                            break
+
                             //Если фигура союзник
                         } else {
                             //Только для attack map, чтобы исключить для короля
@@ -837,6 +838,7 @@ const bishopCastleQueen = {
                             //Выходим из цикла, иначе мы перепрыгнем фигуру
                             break
                         }
+
                         if (k === 0) {
                             if (q === 0) { w++; s++ }  else
                             if (q === 1) { w++      }
