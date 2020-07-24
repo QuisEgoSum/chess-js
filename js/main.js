@@ -137,6 +137,9 @@ const generate = {
         for (let k of Object.keys(king.castling)) {
             king.castling[k] = true
         }
+        for (let k of Object.keys(backlight.historyPos)) {
+            backlight.historyPos[k] = [-1, -1]
+        }
         document.querySelector('#back').setAttribute('disabled', 'disabled')
         document.querySelector('#forward').setAttribute('disabled', 'disabled')
         localStorage.clear()
@@ -399,6 +402,7 @@ const move = {
         backlight.space(backlight.historyPos.pos1[0], backlight.historyPos.pos1[1], false)
         backlight.space(backlight.historyPos.pos2[0], backlight.historyPos.pos2[1], false)
 
+
         //Смена сторон
         this.sideMove = !this.sideMove
         //Если рокировка для королей возможна,
@@ -496,9 +500,9 @@ const move = {
 const backlight = { //Подсветка клеток на поле
     crutchForKing: 0,
     historyPos: {
-        pos1: [0, 0],
-        pos2: [0, 0],
-        posKing: [0, 0],
+        pos1: [-1, -1],
+        pos2: [-1, -1],
+        posKing: [-1, -1],
     },
     checking() {
         if (king.checkStatus && move.selectedFigure.search(`${move.sideMove? 'whiteKing': 'blackKing'}`) === -1) {
@@ -512,7 +516,11 @@ const backlight = { //Подсветка клеток на поле
     //Добавляем/удаляем подсветку для клетки, row, col - ряд и колонка нужной клетки
     //addOrRemove true/false - добавляем/удаляем, color - цвет рамки
     space(row, col, addOrRemove = true, color = 'green') {
-        storage.arraySpace[row][col].style.borderColor = addOrRemove? `${color}`: 'transparent'
+        try {
+            storage.arraySpace[row][col].style.borderColor = addOrRemove? `${color}`: 'transparent'
+        } catch (e) {
+            return
+        }
     },
     //Подсветка возможных ходов
     spaces(name, addOrRemove = true) {
