@@ -1,58 +1,68 @@
 "use strict"
 //Жизнь запутана и ветвиста, как строки моего кода
+const appEl = document.querySelector('.app')
+const backEl = document.getElementById('back')
+const boardEl = document.querySelector('.board')
+const outputEl = document.querySelector('.output')
+const consoleEl = document.querySelector('.console')
+const controlEl = document.querySelector('.control')
+const forwardEl = document.getElementById('forward')
+const continueEl = document.getElementById('continue')
+const nameTileTopEl = document.querySelector('.name-tile__top')
+const nameTileLeftEl = document.querySelector('.name-tile__left')
 
 const menu = {
     newGame() {
         this.continueGame()
         generate.clear()
         generate.generateBoard()
-        document.querySelector('#continue').removeAttribute('disabled')
+        continueEl.removeAttribute('disabled')
     },
     continueGame() {
-        document.querySelector('.control').classList.toggle('js-inactive')
+        controlEl.classList.toggle('js-inactive')
         setTimeout(menu.game, 500)
     },
     game() {
-        document.querySelector('.app').classList.toggle('js-inactive')
-        document.querySelector('.console').classList.toggle('js-inactive')
+        appEl.classList.toggle('js-inactive')
+        consoleEl.classList.toggle('js-inactive')
     },
     backToMenu() {
         this.game()
         setTimeout(function () {
-            document.querySelector('.control').classList.toggle('js-inactive')
+            controlEl.classList.toggle('js-inactive')
         }, 500)
     },
     outputMessageArr: [],
     outputMessage(message, classHtml = 'span'){
         let messageHtml = `<span class=${classHtml} >${message}</span><br>`
-        document.querySelector('.output').insertAdjacentHTML('afterbegin', `${messageHtml}`)
+        outputEl.insertAdjacentHTML('afterbegin', `${messageHtml}`)
         this.outputMessageArr.push(message, classHtml)
     },
     clearMessage() {
-        while (document.querySelector('.output').firstChild) {
-            document.querySelector('.output').removeChild(document.querySelector('.output').firstChild)
+        while (outputEl.firstChild) {
+            outputEl.removeChild(outputEl.firstChild)
         }
     },
     resetMessage() {
         for (let i = 0; i < this.outputMessageArr.length; i += 2) {
             let messageHtml = `<span class=${this.outputMessageArr[i + 1]} >${this.outputMessageArr[i]}</span><br>`
-            document.querySelector('.output').insertAdjacentHTML('afterbegin', `${messageHtml}`)
+            outputEl.insertAdjacentHTML('afterbegin', `${messageHtml}`)
         }
     },
     flip(e) {
         if (!Number(e.target.dataset.counter)) {
-            document.querySelector('.board').style.transform = 'rotate(180deg)'
-            document.querySelector('.name-tile__top').style.flexDirection = 'row-reverse'
-            document.querySelector('.name-tile__left').style.flexDirection = 'column-reverse'
+            boardEl.style.transform = 'rotate(180deg)'
+            nameTileTopEl.style.flexDirection = 'row-reverse'
+            nameTileLeftEl.style.flexDirection = 'column-reverse'
             e.target.dataset.counter = '1'
         } else if (Number(e.target.dataset.counter)) {
-            document.querySelector('.board').style.transform = 'rotate(0deg)'
-            document.querySelector('.name-tile__top').style.flexDirection = 'row'
-            document.querySelector('.name-tile__left').style.flexDirection = 'column'
+            boardEl.style.transform = 'rotate(0deg)'
+            nameTileTopEl.style.flexDirection = 'row'
+            nameTileLeftEl.style.flexDirection = 'column'
             e.target.dataset.counter = '0'
         }
 
-        document.querySelector('.board').classList.toggle('js-active')
+        boardEl.classList.toggle('js-active')
         setTimeout(function () {
             for (let a of storage.arraySpace) {
                 for (let s of a) {
@@ -61,7 +71,7 @@ const menu = {
             }
         }, 500)
         setTimeout(function () {
-            document.querySelector('.board').classList.toggle('js-active')
+            boardEl.classList.toggle('js-active')
         }, 1000)
     }
 }
@@ -127,8 +137,8 @@ const generate = {
         actions.choiceOrMove = true
         move.sideMove = true
         move.counter = 0
-        while (document.querySelector('.board').firstChild) {
-            document.querySelector('.board').removeChild(document.querySelector('.board').firstChild);
+        while (boardEl.firstChild) {
+            boardEl.removeChild(boardEl.firstChild);
         }
         menu.clearMessage()
         history.saves = {}
@@ -140,12 +150,13 @@ const generate = {
         for (let k of Object.keys(backlight.historyPos)) {
             backlight.historyPos[k] = [-1, -1]
         }
-        document.querySelector('#back').setAttribute('disabled', 'disabled')
-        document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        backEl.setAttribute('disabled', 'disabled')
+        forwardEl.setAttribute('disabled', 'disabled')
         localStorage.clear()
     },
     generateBoard(mod = true) {   //Генерируем поле (клетки)
-        const a = document.querySelector('.board')
+        const a = boardEl
+        const rowEls = document.querySelectorAll('.row')
 
         for (let i = 0; i < 8; i++) {
 
@@ -154,35 +165,35 @@ const generate = {
 
             for (let j = 0; j < 8; j++) {
 
-                const q = document.querySelectorAll('.row')[i]
-                q.append(document.createElement('div'))
+                const rowEl = rowEls[i]
+                rowEl.append(document.createElement('div'))
 
                 if (j % 2 === 0) {
 
                     if (i % 2 === 0) {
 
-                        q.lastChild.classList = 'tile'
+                        rowEl.lastChild.classList = 'tile'
 
                     } else {
 
-                        q.lastChild.classList = 'tile tile-dark'
+                        rowEl.lastChild.classList = 'tile tile-dark'
                     }
                 } else {
                     if (i % 2 !== 0) {
 
-                        q.lastChild.classList = 'tile'
+                        rowEl.lastChild.classList = 'tile'
 
                     } else {
 
-                        q.lastChild.classList = 'tile tile-dark'
+                        rowEl.lastChild.classList = 'tile tile-dark'
 
                     }
                 }
                 //data-*
-                document.querySelectorAll('.row')[i].children[j].dataset.x = `${i}`
-                document.querySelectorAll('.row')[i].children[j].dataset.y = `${j}`
+                rowEl.children[j].dataset.x = `${i}`
+                rowEl.children[j].dataset.y = `${j}`
                 //Заполняет массив arraySpace всеми элементами поля
-                storage.arraySpace[i].push(document.querySelectorAll('.row')[i].children[j])
+                storage.arraySpace[i].push(rowEl.children[j])
                 //Заполняет массивы arrayAttack, arrayPositionFigure '0'
                 storage.arrayPositionFigure[i][j] = 0
                 storage.arrayAttack[i][j] = 0
@@ -1241,18 +1252,18 @@ const history = {
         this.saves[`save${move.counter}`]['arrayPossibleMoves'] = b
         this.counter = this.counterMax
         if (this.counter === 1) {
-            document.querySelector('#back').removeAttribute('disabled')
+            document.getElementById('back').removeAttribute('disabled')
         }
-        document.querySelector('#forward').setAttribute('disabled', 'disabled')
+        document.getElementById('forward').setAttribute('disabled', 'disabled')
         localStorage.setItem(`save${move.counter}`, JSON.stringify(this.saves[`save${move.counter}`]))
     },
     back() {
         this.shiftStatus = true
-        document.querySelector('#forward').removeAttribute('disabled')
+        document.getElementById('forward').removeAttribute('disabled')
         if (this.counter <= 1) {
-            document.querySelector('#back').setAttribute('disabled', 'disabled')
+            document.getElementById('back').setAttribute('disabled', 'disabled')
         } else {
-            document.querySelector('#back').removeAttribute('disabled')
+            document.getElementById('back').removeAttribute('disabled')
         }
         if (this.counter > 0) {
             this.counter--
@@ -1264,11 +1275,11 @@ const history = {
     forward() {
         this.shiftStatus = true
         this.counter += 1
-        document.querySelector('#back').removeAttribute('disabled')
+        document.getElementById('back').removeAttribute('disabled')
         if (this.counter === this.counterMax) {
-            document.querySelector('#forward').setAttribute('disabled', 'disabled')
+            document.getElementById('forward').setAttribute('disabled', 'disabled')
         } else {
-            document.querySelector('#forward').removeAttribute('disabled')
+            document.getElementById('forward').removeAttribute('disabled')
         }
         if (this.counter <= this.counterMax) {
             this.replace(this.counter)
@@ -1334,8 +1345,8 @@ const history = {
             this.counterMax = localStorage.length - 2
             this.replace(this.counterMax + 1)
             backlight.checking()
-            document.querySelector('#continue').removeAttribute('disabled')
-            document.querySelector('#back').removeAttribute('disabled')
+            continueEl.removeAttribute('disabled')
+            document.getElementById('back').removeAttribute('disabled')
         }
     }
 }
